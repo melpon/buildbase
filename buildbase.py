@@ -2,9 +2,11 @@
 #
 # 自身のリポジトリにコピーして利用する。
 #
-# 更新する場合は以下のコマンドを利用する
-# curl -LO https://raw.githubusercontent.com/melpon/buildbase/master/buildbase.py
+# 元のファイルは以下のリポジトリにある:
+# https://github.com/melpon/buildbase
 #
+# 更新する場合は以下のコマンドを利用する:
+# curl -LO https://raw.githubusercontent.com/melpon/buildbase/master/buildbase.py
 #
 # ライセンス: Apache License 2.0
 #
