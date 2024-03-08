@@ -6,7 +6,7 @@
 # https://github.com/melpon/buildbase
 #
 # 更新する場合は以下のコマンドを利用する:
-# curl -H 'Cache-Control: no-cache' -LO https://raw.githubusercontent.com/melpon/buildbase/master/buildbase.py
+# curl -LO https://raw.githubusercontent.com/melpon/buildbase/master/buildbase.py
 #
 # ライセンス: Apache License 2.0
 #
