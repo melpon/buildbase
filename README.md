@@ -2,7 +2,13 @@
 
 主に時雨胴で扱うビルドスクリプトのテンプレート
 
-好きなタイミングで buildbase.py を各リポジトリにコピーして、
+自身のリポジトリ上で
+
+```bash
+curl -LO https://raw.githubusercontent.com/melpon/buildbase/master/buildbase.py
+```
+
+のようなコマンドで buildbase.py をダウンロードして、
 
 ```python
 from buildbase import (
