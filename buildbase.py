@@ -1218,9 +1218,9 @@ def install_catch2(version, source_dir, build_dir, install_dir, configuration, c
         if os.path.exists(project_path):
             replace_vcproj_static_runtime(project_path)
         cmd(
-            ["cmake", "--build", ".", f"-j{multiprocessing.cpu_count()}", "--config", configuration]
+            ["cmake", "--build", ".", "--config", configuration, f"-j{multiprocessing.cpu_count()}"]
         )
-        cmd(["cmake", "--build", ".", "--target", "install"])
+        cmd(["cmake", "--build", ".", "--config", configuration, "--target", "install"])
 
 
 @versioned
