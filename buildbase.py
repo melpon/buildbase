@@ -1190,7 +1190,7 @@ def install_yaml(version, source_dir, build_dir, install_dir, cmake_args):
 
 
 @versioned
-def install_catch2(version, source_dir, build_dir, install_dir, cmake_args):
+def install_catch2(version, source_dir, build_dir, install_dir, configuration, cmake_args):
     rm_rf(os.path.join(source_dir, "catch2"))
     rm_rf(os.path.join(install_dir, "catch2"))
     rm_rf(os.path.join(build_dir, "catch2"))
@@ -1204,7 +1204,7 @@ def install_catch2(version, source_dir, build_dir, install_dir, cmake_args):
             [
                 "cmake",
                 os.path.join(source_dir, "catch2"),
-                "-DCMAKE_BUILD_TYPE=Release",
+                f"-DCMAKE_BUILD_TYPE={configuration}",
                 f"-DCMAKE_INSTALL_PREFIX={install_dir}/catch2",
                 "-DCATCH_BUILD_TESTING=OFF",
                 *cmake_args,
@@ -1214,7 +1214,12 @@ def install_catch2(version, source_dir, build_dir, install_dir, cmake_args):
         project_path = os.path.join("src", "Catch2.vcxproj")
         if os.path.exists(project_path):
             replace_vcproj_static_runtime(project_path)
-        cmd(["cmake", "--build", ".", f"-j{multiprocessing.cpu_count()}"])
+        project_path = os.path.join("src", "Catch2WithMain.vcxproj")
+        if os.path.exists(project_path):
+            replace_vcproj_static_runtime(project_path)
+        cmd(
+            ["cmake", "--build", ".", f"-j{multiprocessing.cpu_count()}", "--config", configuration]
+        )
         cmd(["cmake", "--build", ".", "--target", "install"])
 
 
