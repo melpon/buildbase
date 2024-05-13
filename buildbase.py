@@ -761,7 +761,7 @@ def build_sora(
         local_sora_cpp_sdk_args = ["--debug", *local_sora_cpp_sdk_args]
     if local_webrtc_build_dir is not None:
         local_sora_cpp_sdk_args = [
-            "--webrtc-build-dir",
+            "--local-webrtc-build-dir",
             local_webrtc_build_dir,
             *local_sora_cpp_sdk_args,
         ]
