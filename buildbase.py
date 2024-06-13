@@ -686,6 +686,7 @@ def build_and_install_boost(
     architecture,
     android_ndk,
     native_api_level,
+    address_model="64",
 ):
     version_underscore = version.replace(".", "_")
     archive = download(
@@ -740,7 +741,7 @@ def build_and_install_boost(
                         f"toolset={toolset}",
                         f"visibility={visibility}",
                         f"target-os={target_os}",
-                        "address-model=64",
+                        f"address-model={address_model}",
                         "link=static",
                         f"runtime-link={runtime_link}",
                         "threading=multi",
@@ -811,7 +812,7 @@ def build_and_install_boost(
                     f"toolset={toolset}",
                     f"visibility={visibility}",
                     f"target-os={target_os}",
-                    "address-model=64",
+                    f"address-model={address_model}",
                     "link=static",
                     f"runtime-link={runtime_link}",
                     "threading=multi",
@@ -839,7 +840,7 @@ def build_and_install_boost(
                     f"toolset={toolset}",
                     f"visibility={visibility}",
                     f"target-os={target_os}",
-                    "address-model=64",
+                    f"address-model={address_model}",
                     "link=static",
                     f"runtime-link={runtime_link}",
                     "threading=multi",
@@ -925,10 +926,10 @@ def get_sora_info(
 
 
 @versioned
-def install_rootfs(version, install_dir, conf):
+def install_rootfs(version, install_dir, conf, arch="arm64"):
     rootfs_dir = os.path.join(install_dir, "rootfs")
     rm_rf(rootfs_dir)
-    cmd(["multistrap", "--no-auth", "-a", "arm64", "-d", rootfs_dir, "-f", conf])
+    cmd(["multistrap", "--no-auth", "-a", arch, "-d", rootfs_dir, "-f", conf])
     # 絶対パスのシンボリックリンクを相対パスに置き換えていく
     for dir, _, filenames in os.walk(rootfs_dir):
         for filename in filenames:
@@ -1649,7 +1650,9 @@ class PlatformTarget(object):
         if self.os == "raspberry-pi-os":
             return f"raspberry-pi-os_{self.arch}"
         if self.os == "jetson":
-            return "ubuntu-20.04_armv8_jetson"
+            if self.osver is None:
+                return "ubuntu-20.04_armv8_jetson"
+            return f"ubuntu-20.04_armv8_jetson_{self.osver}"
         raise Exception("error")
 
 
