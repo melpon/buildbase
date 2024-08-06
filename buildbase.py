@@ -1630,10 +1630,11 @@ def install_spdlog(version, install_dir):
 
 
 class PlatformTarget(object):
-    def __init__(self, os, osver, arch):
+    def __init__(self, os, osver, arch, extra=None):
         self.os = os
         self.osver = osver
         self.arch = arch
+        self.extra = extra
 
     @property
     def package_name(self):
@@ -1650,9 +1651,13 @@ class PlatformTarget(object):
         if self.os == "raspberry-pi-os":
             return f"raspberry-pi-os_{self.arch}"
         if self.os == "jetson":
+            if self.extra is None:
+                ubuntu_version = "ubuntu-20.04"
+            else:
+                ubuntu_version = self.extra
             if self.osver is None:
-                return "ubuntu-20.04_armv8_jetson"
-            return f"ubuntu-20.04_armv8_jetson_{self.osver}"
+                return f"{ubuntu_version}_armv8_jetson"
+            return f"{ubuntu_version}_armv8_jetson_{self.osver}"
         raise Exception("error")
 
 
@@ -1819,7 +1824,10 @@ def get_webrtc_platform(platform: Platform) -> str:
     elif platform.target.os == "raspberry-pi-os":
         return f"raspberry-pi-os_{platform.target.arch}"
     elif platform.target.os == "jetson":
-        return "ubuntu-20.04_armv8"
+        if platform.target.extra is None:
+            return "ubuntu-20.04_armv8"
+        else:
+            return f"{platform.target.extra}_armv8"
     else:
         raise Exception(f"Unknown platform {platform.target.os}")
 
