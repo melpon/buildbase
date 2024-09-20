@@ -1775,9 +1775,9 @@ class Platform(object):
         else:
             self._check(p.arch in ("x86_64", "arm64", "hololens2"))
 
-    def __init__(self, target_os, target_osver, target_arch):
+    def __init__(self, target_os, target_osver, target_arch, target_extra=None):
         build = get_build_platform()
-        target = PlatformTarget(target_os, target_osver, target_arch)
+        target = PlatformTarget(target_os, target_osver, target_arch, target_extra)
 
         self._check_platform_target(build)
         self._check_platform_target(target)
