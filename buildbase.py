@@ -688,6 +688,7 @@ def build_and_install_boost(
     native_api_level,
     address_model="64",
     runtime_link=None,
+    android_build_platform="linux-x86_64",
 ):
     version_underscore = version.replace(".", "_")
     archive = download(
@@ -780,10 +781,10 @@ def build_and_install_boost(
             # Android の場合、android-ndk を使ってビルドする
             with open("project-config.jam", "w") as f:
                 bin = os.path.join(
-                    android_ndk, "toolchains", "llvm", "prebuilt", "linux-x86_64", "bin"
+                    android_ndk, "toolchains", "llvm", "prebuilt", android_build_platform, "bin"
                 )
                 sysroot = os.path.join(
-                    android_ndk, "toolchains", "llvm", "prebuilt", "linux-x86_64", "sysroot"
+                    android_ndk, "toolchains", "llvm", "prebuilt", android_build_platform, "sysroot"
                 )
                 f.write(
                     f"using clang \
@@ -1629,6 +1630,90 @@ def install_spdlog(version, install_dir):
     spdlog_install_dir = os.path.join(install_dir, "spdlog")
     rm_rf(spdlog_install_dir)
     git_clone_shallow("https://github.com/gabime/spdlog.git", version, spdlog_install_dir)
+
+
+BORINGSSL_PATCH_NO_BSSL = r"""
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 38d63db..b97b175 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -795,7 +795,7 @@ endif()
+ 
+ if(INSTALL_ENABLED)
+   install(TARGETS crypto ssl EXPORT OpenSSLTargets)
+-  install(TARGETS bssl)
++  # install(TARGETS bssl)
+   install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+   install(EXPORT OpenSSLTargets
+           FILE OpenSSLTargets.cmake
+"""
+
+
+@versioned
+def install_boringssl(
+    version,
+    source_dir: str,
+    build_dir: str,
+    install_dir: str,
+    configuration: str,
+    cmake_args: List[str],
+):
+    boringssl_source_dir = os.path.join(source_dir, "boringssl")
+    boringssl_build_dir = os.path.join(build_dir, "boringssl")
+    boringssl_install_dir = os.path.join(install_dir, "boringssl")
+    rm_rf(boringssl_source_dir)
+    rm_rf(boringssl_build_dir)
+    rm_rf(boringssl_install_dir)
+    git_clone_shallow("https://boringssl.googlesource.com/boringssl", version, boringssl_source_dir)
+    apply_patch_text(BORINGSSL_PATCH_NO_BSSL, boringssl_source_dir, 1)
+    mkdir_p(boringssl_build_dir)
+    with cd(boringssl_build_dir):
+        cmd(
+            [
+                "cmake",
+                f"-DCMAKE_INSTALL_PREFIX={cmake_path(boringssl_install_dir)}",
+                f"-DCMAKE_BUILD_TYPE={configuration}",
+                "-DBUILD_SHARED_LIBS=OFF",
+                "-GNinja",
+                boringssl_source_dir,
+                *cmake_args,
+            ]
+        )
+        cmd(
+            ["cmake", "--build", ".", f"-j{multiprocessing.cpu_count()}", "--config", configuration]
+        )
+        cmd(["cmake", "--install", ".", "--config", configuration])
+
+
+@versioned
+def install_opus(
+    version, source_dir, build_dir, install_dir, configuration: str, cmake_args: List[str]
+):
+    opus_source_dir = os.path.join(source_dir, "opus")
+    opus_build_dir = os.path.join(build_dir, "opus")
+    opus_install_dir = os.path.join(install_dir, "opus")
+    rm_rf(opus_source_dir)
+    rm_rf(opus_build_dir)
+    rm_rf(opus_install_dir)
+    git_clone_shallow("https://gitlab.xiph.org/xiph/opus", version, opus_source_dir)
+    mkdir_p(opus_build_dir)
+    with cd(opus_build_dir):
+        cmd(
+            [
+                "cmake",
+                f"-DCMAKE_INSTALL_PREFIX={cmake_path(opus_install_dir)}",
+                f"-DCMAKE_BUILD_TYPE={configuration}",
+                "-DOPUS_BUILD_SHARED_LIBRARY=OFF",
+                "-DOPUS_BUILD_TESTING=OFF",
+                "-DOPUS_BUILD_PROGRAMS=OFF",
+                opus_source_dir,
+                *cmake_args,
+            ]
+        )
+        cmd(
+            ["cmake", "--build", ".", f"-j{multiprocessing.cpu_count()}", "--config", configuration]
+        )
+        cmd(["cmake", "--install", ".", "--config", configuration])
 
 
 class PlatformTarget(object):
