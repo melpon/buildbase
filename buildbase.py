@@ -413,7 +413,7 @@ def apply_patch_text(patch_text, dir, depth):
                     f"--directory={directory}",
                     "-",
                 ],
-                input=BOOST_PATCH_SUPPORT_14_4,
+                input=patch_text,
                 text=True,
                 encoding="utf-8",
             )
@@ -697,8 +697,17 @@ def build_and_install_boost(
     )
     extract(archive, output_dir=build_dir, output_dirname="boost")
     with cd(os.path.join(build_dir, "boost")):
-        bootstrap = ".\\bootstrap.bat" if target_os == "windows" else "./bootstrap.sh"
-        b2 = "b2" if target_os == "windows" else "./b2"
+        if target_os == "windows":
+            bootstrap = ".\\bootstrap.bat"
+            b2 = "b2"
+        elif target_os == "android" and android_build_platform == "windows-x86_64":
+            # Android を Windows でビルドする場合
+            bootstrap = ".\\bootstrap.bat"
+            b2 = "b2"
+        else:
+            bootstrap = "./bootstrap.sh"
+            b2 = "./b2"
+
         if runtime_link is None:
             runtime_link = "static" if target_os == "windows" else "shared"
 
@@ -786,14 +795,18 @@ def build_and_install_boost(
                 sysroot = os.path.join(
                     android_ndk, "toolchains", "llvm", "prebuilt", android_build_platform, "sysroot"
                 )
+
+                def escape(s):
+                    return s.replace("\\", "/").replace(":", "\\:")
+
                 f.write(
                     f"using clang \
                     : android \
-                    : {os.path.join(bin, 'clang++')} \
+                    : {escape(os.path.join(bin, 'clang++'))} \
                       --target=aarch64-none-linux-android{native_api_level} \
-                      --sysroot={sysroot} \
-                    : <archiver>{os.path.join(bin, 'llvm-ar')} \
-                      <ranlib>{os.path.join(bin, 'llvm-ranlib')} \
+                      --sysroot={escape(sysroot)} \
+                    : <archiver>{escape(os.path.join(bin, 'llvm-ar'))} \
+                      <ranlib>{escape(os.path.join(bin, 'llvm-ranlib'))} \
                     ; \
                     "
                 )
@@ -977,18 +990,19 @@ def install_rootfs(version, install_dir, conf, arch="arm64"):
 
 @versioned
 def install_android_ndk(version, install_dir, source_dir, platform="linux"):
-    if platform not in ("darwin", "linux"):
+    if platform not in ("windows", "darwin", "linux"):
         raise Exception(f"Not supported platform: {platform}")
 
-    if platform == "darwin":
+    if platform == "windows":
+        url = f"https://dl.google.com/android/repository/android-ndk-{version}-{platform}.zip"
+    elif platform == "darwin":
         url = f"https://dl.google.com/android/repository/android-ndk-{version}-{platform}.dmg"
-        file = f"android-ndk-{version}-{platform}.dmg"
     else:
         url = f"https://dl.google.com/android/repository/android-ndk-{version}-{platform}.zip"
     archive = download(url, source_dir)
     rm_rf(os.path.join(install_dir, "android-ndk"))
     if platform == "darwin":
-        cap = cmdcap(["hdiutil", "attach", os.path.join(source_dir, file)])
+        cap = cmdcap(["hdiutil", "attach", archive])
         # 以下のような結果が得られるはずなので、ここから /Volumes/Android NDK r26 のところだけ取り出す
         # /dev/disk4              GUID_partition_scheme
         # /dev/disk4s1            EFI
@@ -1674,7 +1688,6 @@ def install_boringssl(
                 f"-DCMAKE_INSTALL_PREFIX={cmake_path(boringssl_install_dir)}",
                 f"-DCMAKE_BUILD_TYPE={configuration}",
                 "-DBUILD_SHARED_LIBS=OFF",
-                "-GNinja",
                 boringssl_source_dir,
                 *cmake_args,
             ]
