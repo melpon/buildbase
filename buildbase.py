@@ -795,10 +795,8 @@ def build_and_install_boost(
                 sysroot = os.path.join(
                     android_ndk, "toolchains", "llvm", "prebuilt", android_build_platform, "sysroot"
                 )
-
                 def escape(s):
                     return s.replace("\\", "/").replace(":", "\\:")
-
                 f.write(
                     f"using clang \
                     : android \
@@ -1719,6 +1717,7 @@ def install_opus(
                 "-DOPUS_BUILD_SHARED_LIBRARY=OFF",
                 "-DOPUS_BUILD_TESTING=OFF",
                 "-DOPUS_BUILD_PROGRAMS=OFF",
+                "-DOPUS_STATIC_RUNTIME=ON",
                 opus_source_dir,
                 *cmake_args,
             ]
@@ -1727,6 +1726,28 @@ def install_opus(
             ["cmake", "--build", ".", f"-j{multiprocessing.cpu_count()}", "--config", configuration]
         )
         cmd(["cmake", "--install", ".", "--config", configuration])
+
+
+@versioned
+def install_nasm(version, source_dir, install_dir, platform: str):
+    if platform not in ('macosx', 'win32', 'win64'):
+        raise Exception(f"Unsupported platform: {platform}")
+    url = f'https://www.nasm.us/pub/nasm/releasebuilds/{version}/{platform}/nasm-{version}-{platform}.zip'
+    path = download(url, source_dir)
+    nasm_install_dir = os.path.join(install_dir, 'nasm')
+    rm_rf(nasm_install_dir)
+    extract(path, install_dir, 'nasm')
+
+
+@versioned
+def install_ninja(version, source_dir, install_dir, platform):
+    if platform not in ('win', 'winarm64', 'linux-aarch64', 'linux', 'mac'):
+        raise Exception(f"Unsupported platform: {platform}")
+    url = f'https://github.com/ninja-build/ninja/releases/download/{version}/ninja-{platform}.zip'
+    path = download(url, source_dir)
+    ninja_install_dir = os.path.join(install_dir, 'ninja')
+    rm_rf(ninja_install_dir)
+    extract(path, install_dir, 'ninja')
 
 
 class PlatformTarget(object):
