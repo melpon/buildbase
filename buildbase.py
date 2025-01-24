@@ -460,7 +460,7 @@ def replace_vcproj_static_runtime(project_file: str):
 @versioned
 def install_webrtc(version, source_dir, install_dir, platform: str):
     win = platform.startswith("windows_")
-    filename = f'webrtc.{platform}.{"zip" if win else "tar.gz"}'
+    filename = f"webrtc.{platform}.{'zip' if win else 'tar.gz'}"
     rm_rf(os.path.join(source_dir, filename))
     archive = download(
         f"https://github.com/shiguredo-webrtc-build/webrtc-build/releases/download/{version}/{filename}",
@@ -563,7 +563,7 @@ def get_webrtc_info(
 def install_boost(version, source_dir, install_dir, sora_version, platform: str):
     win = platform.startswith("windows_")
     filename = (
-        f'boost-{version}_sora-cpp-sdk-{sora_version}_{platform}.{"zip" if win else "tar.gz"}'
+        f"boost-{version}_sora-cpp-sdk-{sora_version}_{platform}.{'zip' if win else 'tar.gz'}"
     )
     rm_rf(os.path.join(source_dir, filename))
     archive = download(
@@ -740,16 +740,16 @@ def build_and_install_boost(
                         b2,
                         "install",
                         "-d+0",
-                        f'--build-dir={os.path.join(build_dir, "boost", f"build-{arch}-{sdk}")}',
-                        f'--prefix={os.path.join(build_dir, "boost", f"install-{arch}-{sdk}")}',
+                        f"--build-dir={os.path.join(build_dir, 'boost', f'build-{arch}-{sdk}')}",
+                        f"--prefix={os.path.join(build_dir, 'boost', f'install-{arch}-{sdk}')}",
                         "--with-json",
                         "--with-filesystem",
                         "--layout=system",
                         "--ignore-site-config",
-                        f'variant={"debug" if debug else "release"}',
-                        f'cflags={" ".join(cflags)}',
-                        f'cxxflags={" ".join(cxxflags)}',
-                        f'linkflags={" ".join(linkflags)}',
+                        f"variant={'debug' if debug else 'release'}",
+                        f"cflags={' '.join(cflags)}",
+                        f"cxxflags={' '.join(cxxflags)}",
+                        f"linkflags={' '.join(linkflags)}",
                         f"toolset={toolset}",
                         f"visibility={visibility}",
                         f"target-os={target_os}",
@@ -795,8 +795,10 @@ def build_and_install_boost(
                 sysroot = os.path.join(
                     android_ndk, "toolchains", "llvm", "prebuilt", android_build_platform, "sysroot"
                 )
+
                 def escape(s):
                     return s.replace("\\", "/").replace(":", "\\:")
+
                 f.write(
                     f"using clang \
                     : android \
@@ -813,16 +815,16 @@ def build_and_install_boost(
                     b2,
                     "install",
                     "-d+0",
-                    f'--prefix={os.path.join(install_dir, "boost")}',
+                    f"--prefix={os.path.join(install_dir, 'boost')}",
                     "--with-json",
                     "--with-filesystem",
                     "--layout=system",
                     "--ignore-site-config",
-                    f'variant={"debug" if debug else "release"}',
+                    f"variant={'debug' if debug else 'release'}",
                     f"compileflags=--sysroot={sysroot}",
-                    f'cflags={" ".join(cflags)}',
-                    f'cxxflags={" ".join(cxxflags)}',
-                    f'linkflags={" ".join(linkflags)}',
+                    f"cflags={' '.join(cflags)}",
+                    f"cxxflags={' '.join(cxxflags)}",
+                    f"linkflags={' '.join(linkflags)}",
                     f"toolset={toolset}",
                     f"visibility={visibility}",
                     f"target-os={target_os}",
@@ -842,15 +844,15 @@ def build_and_install_boost(
                     b2,
                     "install",
                     "-d+0",
-                    f'--prefix={os.path.join(install_dir, "boost")}',
+                    f"--prefix={os.path.join(install_dir, 'boost')}",
                     "--with-json",
                     "--with-filesystem",
                     "--layout=system",
                     "--ignore-site-config",
-                    f'variant={"debug" if debug else "release"}',
-                    f'cflags={" ".join(cflags)}',
-                    f'cxxflags={" ".join(cxxflags)}',
-                    f'linkflags={" ".join(linkflags)}',
+                    f"variant={'debug' if debug else 'release'}",
+                    f"cflags={' '.join(cflags)}",
+                    f"cxxflags={' '.join(cxxflags)}",
+                    f"linkflags={' '.join(linkflags)}",
                     f"toolset={toolset}",
                     f"visibility={visibility}",
                     f"target-os={target_os}",
@@ -866,7 +868,7 @@ def build_and_install_boost(
 @versioned
 def install_sora(version, source_dir, install_dir, platform: str):
     win = platform.startswith("windows_")
-    filename = f'sora-cpp-sdk-{version}_{platform}.{"zip" if win else "tar.gz"}'
+    filename = f"sora-cpp-sdk-{version}_{platform}.{'zip' if win else 'tar.gz'}"
     rm_rf(os.path.join(source_dir, filename))
     archive = download(
         f"https://github.com/shiguredo/sora-cpp-sdk/releases/download/{version}/{filename}",
@@ -963,7 +965,7 @@ def install_rootfs(version, install_dir, conf, arch="arm64"):
                 continue
             # 相対パスに置き換える
             relpath = os.path.relpath(targetpath, dir)
-            logging.debug(f"{linkpath[len(rootfs_dir):]} targets {target} to {relpath}")
+            logging.debug(f"{linkpath[len(rootfs_dir) :]} targets {target} to {relpath}")
             os.remove(linkpath)
             os.symlink(relpath, linkpath)
 
@@ -1386,7 +1388,7 @@ def install_openh264(version, source_dir, install_dir, is_windows):
                         file, os.path.join(install_dir, "openh264", "include", "wels", file)
                     )
         else:
-            cmd(["make", f'PREFIX={os.path.join(install_dir, "openh264")}', "install-headers"])
+            cmd(["make", f"PREFIX={os.path.join(install_dir, 'openh264')}", "install-headers"])
 
 
 @versioned
@@ -1603,7 +1605,15 @@ index 7f1b69f..bcf5577 100644
 
 
 @versioned
-def install_grpc(version, source_dir, build_dir, install_dir, debug: bool, cmake_args: List[str]):
+def install_grpc(
+    version,
+    source_dir,
+    build_dir,
+    install_dir,
+    debug: bool,
+    cmake_args: List[str],
+    cmake_build_args: List[str] = [],
+):
     grpc_source_dir = os.path.join(source_dir, "grpc")
     grpc_build_dir = os.path.join(build_dir, "grpc")
     grpc_install_dir = os.path.join(install_dir, "grpc")
@@ -1625,7 +1635,15 @@ def install_grpc(version, source_dir, build_dir, install_dir, debug: bool, cmake
             ]
         )
         cmd(
-            ["cmake", "--build", ".", f"-j{multiprocessing.cpu_count()}", "--config", configuration]
+            [
+                "cmake",
+                "--build",
+                ".",
+                f"-j{multiprocessing.cpu_count()}",
+                "--config",
+                configuration,
+                *cmake_build_args,
+            ]
         )
         cmd(["cmake", "--install", ".", "--config", configuration])
 
