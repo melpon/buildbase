@@ -172,7 +172,7 @@ def download(url: str, output_dir: Optional[str] = None, filename: Optional[str]
 def read_version_file(path: str) -> Dict[str, str]:
     versions = {}
 
-    lines = open(path).readlines()
+    lines = open(path, encoding="utf-8").readlines()
     for line in lines:
         line = line.strip()
 
@@ -205,13 +205,13 @@ def versioned(func):
             del kwargs["ignore_version"]
 
         if os.path.exists(version_file):
-            ver = open(version_file).read()
+            ver = open(version_file, encoding="utf-8").read()
             if ver.strip() == version.strip():
                 return
 
         r = func(version=version, *args, **kwargs)
 
-        with open(version_file, "w") as f:
+        with open(version_file, "w", encoding="utf-8") as f:
             f.write(version)
 
         return r
@@ -266,7 +266,7 @@ def _extractzip(z: zipfile.ZipFile, path: str):
         mod = info.external_attr >> 16
         if (mod & 0o120000) == 0o120000:
             # シンボリックリンク
-            with open(filepath, "r") as f:
+            with open(filepath, "r", encoding="utf-8") as f:
                 src = f.read()
             os.remove(filepath)
             with cd(os.path.dirname(filepath)):
@@ -393,7 +393,7 @@ def apply_patch(patch, dir, depth):
                 ]
             )
         else:
-            with open(patch) as stdin:
+            with open(patch, encoding="utf-8") as stdin:
                 cmd(["patch", f"-p{depth}"], stdin=stdin)
 
 
@@ -723,7 +723,7 @@ def build_and_install_boost(
                 clangpp = cmdcap(["xcodebuild", "-find", "clang++"])
                 sysroot = cmdcap(["xcrun", "--sdk", sdk, "--show-sdk-path"])
                 boost_arch = "x86" if arch == "x86_64" else "arm"
-                with open("project-config.jam", "w") as f:
+                with open("project-config.jam", "w", encoding="utf-8") as f:
                     f.write(
                         f"using clang \
                         : iphone \
@@ -788,7 +788,7 @@ def build_and_install_boost(
                     )
         elif target_os == "android":
             # Android の場合、android-ndk を使ってビルドする
-            with open("project-config.jam", "w") as f:
+            with open("project-config.jam", "w", encoding="utf-8") as f:
                 bin = os.path.join(
                     android_ndk, "toolchains", "llvm", "prebuilt", android_build_platform, "bin"
                 )
@@ -835,7 +835,7 @@ def build_and_install_boost(
             )
         else:
             if len(cxx) != 0:
-                with open("project-config.jam", "w") as f:
+                with open("project-config.jam", "w", encoding="utf-8") as f:
                     f.write(f"using {toolset} : : {cxx} : ;")
             cmd(
                 [
