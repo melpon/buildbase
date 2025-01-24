@@ -1730,24 +1730,24 @@ def install_opus(
 
 @versioned
 def install_nasm(version, source_dir, install_dir, platform: str):
-    if platform not in ('macosx', 'win32', 'win64'):
+    if platform not in ("macosx", "win32", "win64"):
         raise Exception(f"Unsupported platform: {platform}")
-    url = f'https://www.nasm.us/pub/nasm/releasebuilds/{version}/{platform}/nasm-{version}-{platform}.zip'
+    url = f"https://www.nasm.us/pub/nasm/releasebuilds/{version}/{platform}/nasm-{version}-{platform}.zip"
     path = download(url, source_dir)
-    nasm_install_dir = os.path.join(install_dir, 'nasm')
+    nasm_install_dir = os.path.join(install_dir, "nasm")
     rm_rf(nasm_install_dir)
-    extract(path, install_dir, 'nasm')
+    extract(path, install_dir, "nasm")
 
 
 @versioned
 def install_ninja(version, source_dir, install_dir, platform):
-    if platform not in ('win', 'winarm64', 'linux-aarch64', 'linux', 'mac'):
+    if platform not in ("win", "winarm64", "linux-aarch64", "linux", "mac"):
         raise Exception(f"Unsupported platform: {platform}")
-    url = f'https://github.com/ninja-build/ninja/releases/download/{version}/ninja-{platform}.zip'
+    url = f"https://github.com/ninja-build/ninja/releases/download/{version}/ninja-{platform}.zip"
     path = download(url, source_dir)
-    ninja_install_dir = os.path.join(install_dir, 'ninja')
+    ninja_install_dir = os.path.join(install_dir, "ninja")
     rm_rf(ninja_install_dir)
-    extract(path, install_dir, 'ninja')
+    extract(path, install_dir, "ninja")
 
 
 class PlatformTarget(object):
