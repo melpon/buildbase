@@ -1770,6 +1770,15 @@ def install_ninja(version, source_dir, install_dir, platform):
     extract(path, install_dir, "ninja")
 
 
+@versioned
+def install_vswhere(version, install_dir):
+    url = f"https://github.com/microsoft/vswhere/releases/download/{version}/vswhere.exe"
+    vswhere_install_dir = os.path.join(install_dir, "vswhere")
+    rm_rf(vswhere_install_dir)
+    mkdir_p(vswhere_install_dir)
+    download(url, vswhere_install_dir)
+
+
 class PlatformTarget(object):
     def __init__(self, os, osver, arch, extra=None):
         self.os = os
