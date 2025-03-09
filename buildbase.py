@@ -411,7 +411,7 @@ def apply_patch_text(patch_text, dir, depth):
                     "--ignore-space-change",
                     "--ignore-whitespace",
                     "--whitespace=nowarn",
-                    "--reject,",
+                    "--reject",
                     f"--directory={directory}",
                     "-",
                 ],
