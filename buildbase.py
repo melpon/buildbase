@@ -302,7 +302,12 @@ def _extractzip(z: zipfile.ZipFile, path: str):
 def extract(file: str, output_dir: str, output_dirname: str, filetype: Optional[str] = None):
     path = os.path.join(output_dir, output_dirname)
     logging.info(f"Extract {file} to {path}")
-    if filetype == "gzip" or file.endswith(".tar.gz"):
+    if (
+        filetype == "gzip"
+        or file.endswith(".tar.gz")
+        or filetype == "lzma"
+        or file.endswith(".tar.xz")
+    ):
         rm_rf(path)
         with tarfile.open(file) as t:
             dir = is_single_dir_tar(t)
@@ -1866,6 +1871,35 @@ def install_opus(
     rm_rf(opus_build_dir)
     rm_rf(opus_install_dir)
     git_clone_shallow("https://gitlab.xiph.org/xiph/opus", version, opus_source_dir)
+    with cd(opus_source_dir):
+
+        def replace_file(file_path: str, old: str, new: str):
+            with open(file_path, "r") as f:
+                content = f.read()
+            content = content.replace(old, new)
+            with open(file_path, "w") as f:
+                f.write(content)
+
+        # パッチの適用。
+        # Unity と libopus で compute_allocation という名前の関数が重複してしまっているので、
+        # compute_allocation を compute_pulse_allocation に置き換える。
+        # 参照: https://stackoverflow.com/questions/40402328/opus-decoder-on-ios-is-crashing-with-no-obvious-reason
+        replace_file(
+            os.path.join("celt", "celt_decoder.c"), "compute_allocation", "compute_pulse_allocation"
+        )
+        replace_file(
+            os.path.join("celt", "celt_encoder.c"), "compute_allocation", "compute_pulse_allocation"
+        )
+        replace_file(
+            os.path.join("celt", "modes.c"), "compute_allocation", "compute_pulse_allocation"
+        )
+        replace_file(
+            os.path.join("celt", "rate.c"), "compute_allocation", "compute_pulse_allocation"
+        )
+        replace_file(
+            os.path.join("celt", "rate.h"), "compute_allocation", "compute_pulse_allocation"
+        )
+
     mkdir_p(opus_build_dir)
     with cd(opus_build_dir):
         cmd(
