@@ -1871,35 +1871,6 @@ def install_opus(
     rm_rf(opus_build_dir)
     rm_rf(opus_install_dir)
     git_clone_shallow("https://gitlab.xiph.org/xiph/opus", version, opus_source_dir)
-    with cd(opus_source_dir):
-
-        def replace_file(file_path: str, old: str, new: str):
-            with open(file_path, "r") as f:
-                content = f.read()
-            content = content.replace(old, new)
-            with open(file_path, "w") as f:
-                f.write(content)
-
-        # パッチの適用。
-        # Unity と libopus で compute_allocation という名前の関数が重複してしまっているので、
-        # compute_allocation を compute_pulse_allocation に置き換える。
-        # 参照: https://stackoverflow.com/questions/40402328/opus-decoder-on-ios-is-crashing-with-no-obvious-reason
-        replace_file(
-            os.path.join("celt", "celt_decoder.c"), "compute_allocation", "compute_pulse_allocation"
-        )
-        replace_file(
-            os.path.join("celt", "celt_encoder.c"), "compute_allocation", "compute_pulse_allocation"
-        )
-        replace_file(
-            os.path.join("celt", "modes.c"), "compute_allocation", "compute_pulse_allocation"
-        )
-        replace_file(
-            os.path.join("celt", "rate.c"), "compute_allocation", "compute_pulse_allocation"
-        )
-        replace_file(
-            os.path.join("celt", "rate.h"), "compute_allocation", "compute_pulse_allocation"
-        )
-
     mkdir_p(opus_build_dir)
     with cd(opus_build_dir):
         cmd(
