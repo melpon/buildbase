@@ -1112,6 +1112,21 @@ def install_android_sdk_cmdline_tools(version, install_dir, source_dir):
 
 
 @versioned
+def install_android_sdk_platform_tools(version, install_dir, source_dir, platform):
+    if version not in ("latest",):
+        raise Exception(f"Supports only 'latest' version, but got: {version}")
+    if platform not in ("windows", "darwin", "linux"):
+        raise Exception(f"Not supported platform: {platform}")
+    archive = download(
+        f"https://dl.google.com/android/repository/platform-tools-{version}-{platform}.zip",
+        source_dir,
+    )
+    tools_dir = os.path.join(install_dir, "android-sdk-platform-tools")
+    rm_rf(tools_dir)
+    extract(archive, output_dir=tools_dir, output_dirname="platform-tools")
+
+
+@versioned
 def install_llvm(
     version,
     install_dir,
