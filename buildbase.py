@@ -626,7 +626,14 @@ def get_webrtc_info(
 
 
 @versioned
-def install_boost(version, source_dir, install_dir, sora_version, platform: str):
+def install_boost(
+    version,
+    source_dir,
+    install_dir,
+    sora_version,
+    platform: str,
+    expected_sha256: Optional[str] = None,
+):
     win = platform.startswith("windows_")
     filename = (
         f"boost-{version}_sora-cpp-sdk-{sora_version}_{platform}.{'zip' if win else 'tar.gz'}"
@@ -635,6 +642,7 @@ def install_boost(version, source_dir, install_dir, sora_version, platform: str)
     archive = download(
         f"https://github.com/shiguredo/sora-cpp-sdk/releases/download/{sora_version}/{filename}",
         output_dir=source_dir,
+        expected_sha256=expected_sha256,
     )
     rm_rf(os.path.join(install_dir, "boost"))
     extract(archive, output_dir=install_dir, output_dirname="boost")
@@ -1478,13 +1486,17 @@ def install_blend2d_official(
     build_dir,
     install_dir,
     cmake_args,
+    expected_sha256: Optional[str] = None,
 ):
     rm_rf(os.path.join(source_dir, "blend2d"))
     rm_rf(os.path.join(build_dir, "blend2d"))
     rm_rf(os.path.join(install_dir, "blend2d"))
 
-    url = f"https://blend2d.com/download/blend2d-{version}.tar.gz"
-    path = download(url, source_dir)
+    # 公式サイトに負荷をかけないための時雨堂によるミラー
+    url = f"https://oss-mirrors.shiguredo.jp/blend2d-{version}.tar.gz"
+    # Blend2d 公式
+    # url = f"https://blend2d.com/download/blend2d-{version}.tar.gz"
+    path = download(url, source_dir, expected_sha256=expected_sha256)
     extract(path, source_dir, "blend2d")
     _build_blend2d(
         configuration=configuration,
