@@ -749,7 +749,6 @@ def build_and_install_boost(
     source_dir,
     build_dir,
     install_dir,
-    expected_sha256: str,
     debug: bool,
     cxx: str,
     cflags: List[str],
@@ -764,6 +763,7 @@ def build_and_install_boost(
     address_model="64",
     runtime_link=None,
     android_build_platform="linux-x86_64",
+    expected_sha256: Optional[str] = None,
 ):
     version_underscore = version.replace(".", "_")
 
