@@ -531,7 +531,7 @@ def install_webrtc(version, source_dir, install_dir, platform: str):
 
 def build_webrtc(platform, local_webrtc_build_dir, local_webrtc_build_args, debug):
     with cd(local_webrtc_build_dir):
-        args = ["--webrtc-nobuild-ios-framework", "--webrtc-nobuild-android-aar"]
+        args = []
         if debug:
             args += ["--debug"]
 
