@@ -175,7 +175,7 @@ def download(
     try:
         logging.info(f"Downloading {url} to {output_path}")
         if shutil.which("curl") is not None:
-            cmd(["curl", "-fLo", output_path, url])
+            cmd(["curl", "--http1.1", "-fLo", output_path, url])
         else:
             cmd(["wget", "-cO", output_path, url])
 
@@ -846,6 +846,8 @@ def build_and_install_boost(
 ):
     version_underscore = version.replace(".", "_")
 
+    rm_rf(os.path.join(install_dir, "boost"))
+
     archive = download(
         # 公式サイトに負荷をかけないための時雨堂によるミラー
         f"https://oss-mirrors.shiguredo.jp/boost_{version_underscore}.tar.gz",
@@ -927,7 +929,6 @@ def build_and_install_boost(
                 )
             arch, sdk = IOS_BUILD_TARGETS[0]
             installed_path = os.path.join(build_dir, "boost", f"install-{arch}-{sdk}")
-            rm_rf(os.path.join(install_dir, "boost"))
             cmd(["cp", "-r", installed_path, os.path.join(install_dir, "boost")])
 
             for lib in enum_all_files(
