@@ -1,0 +1,27 @@
+# Configuration file for `prek`, a git hook framework written in Rust.
+# See https://prek.j178.dev for more information.
+#:schema https://www.schemastore.org/prek.json
+
+# prek 組み込みの汎用フック (オフライン・追加セットアップ不要)
+[[repos]]
+repo = "builtin"
+hooks = [
+  { id = "trailing-whitespace" },
+  { id = "end-of-file-fixer" },
+  { id = "mixed-line-ending" },
+  { id = "check-merge-conflict" },
+  { id = "check-added-large-files" },
+  { id = "detect-private-key" },
+  { id = "check-yaml", args = ["--allow-multiple-documents"] },
+  { id = "check-toml" }
+]
+
+[[repos]]
+repo = "https://github.com/astral-sh/ruff-pre-commit"
+rev = "v0.16.0"
+hooks = [
+  # ruff format: フォーマッタ
+  { id = "ruff-format", priority = 0 },
+  # ruff check: リンタと自動修正
+  { id = "ruff-check", priority = 10 }
+]
